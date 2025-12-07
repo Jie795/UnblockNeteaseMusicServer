@@ -3,6 +3,7 @@ const request = require('../request');
 const {
 	PROVIDERS: providers,
 	DEFAULT_SOURCE: defaultSrc,
+	registerPyncmd,
 } = require('../consts');
 const { isHostWrapper } = require('../utilities');
 const SongNotAvailable = require('../exceptions/SongNotAvailable');
@@ -10,6 +11,7 @@ const RequestFailed = require('../exceptions/RequestFailed');
 const IncompleteAudioData = require('../exceptions/IncompleteAudioData');
 const { logScope } = require('../logger');
 const RequestCancelled = require('../exceptions/RequestCancelled');
+const pyncmdProvider = require('./pyncmd');
 
 const logger = logScope('provider/match');
 
@@ -59,9 +61,25 @@ async function getAudioFromSource(source, info) {
 }
 
 async function match(id, source, data) {
-	const candidate = (source || global.source || defaultSrc).filter(
-		(name) => name in providers
-	);
+	// Dynamically register pyncmd-{source} providers if needed
+	const candidate = (source || global.source || defaultSrc)
+		.map((name) => {
+			// Check if it's a pyncmd-{source} format provider
+			if (name.startsWith('pyncmd-') && !(name in providers)) {
+				const sourceName = pyncmdProvider.getSourceFromProviderName(name);
+				// Register the provider dynamically (for non-netease sources or explicit pyncmd-{source})
+				if (sourceName !== 'netease' || name !== 'pyncmd') {
+					registerPyncmd(sourceName);
+					// Ensure the provider name matches the registered name
+					const providerName = `pyncmd-${sourceName}`;
+					if (providerName in providers) {
+						return providerName;
+					}
+				}
+			}
+			return name;
+		})
+		.filter((name) => name in providers);
 
 	const audioInfo = await find(id, data);
 	let audioData = null;
@@ -107,17 +125,57 @@ async function match(id, source, data) {
 			throw 'No audioData!';
 		}
 	} else {
-		audioData = await Promise.any(
-			candidate.map(async (source) =>
-				getAudioFromSource(source, audioInfo).catch((e) => {
-					if (e) {
-						if (e instanceof RequestCancelled) logger.debug(e);
-						else logger.error(e);
+		try {
+			audioData = await Promise.any(
+				candidate.map(async (source) =>
+					getAudioFromSource(source, audioInfo).catch((e) => {
+						if (e) {
+							if (e instanceof RequestCancelled) logger.debug(e);
+							else logger.error(e);
+						}
+						throw e; // We just log it instead of resolving it.
+					})
+				)
+			);
+		} catch (e) {
+			// Handle AggregateError from Promise.any when all promises are rejected
+			if (e && e.name === 'AggregateError' && e.errors) {
+				logger.error(
+					{
+						err: e,
+						errors: e.errors,
+						stack: e.stack,
+						candidate,
+						audioInfo,
+					},
+					`All promises were rejected for song [${audioInfo?.id || 'unknown'}]. Errors from ${e.errors.length} sources:`
+				);
+				// Log each individual error
+				e.errors.forEach((error, index) => {
+					if (error) {
+						logger.error(
+							{
+								err: error,
+								stack: error.stack,
+								source: candidate[index],
+							},
+							`Source [${candidate[index]}] failed:`
+						);
 					}
-					throw e; // We just log it instead of resolving it.
-				})
-			)
-		);
+				});
+			} else {
+				logger.error(
+					{
+						err: e,
+						stack: e?.stack,
+						candidate,
+						audioInfo,
+					},
+					`Failed to match song [${audioInfo?.id || 'unknown'}]:`
+				);
+			}
+			throw e;
+		}
 	}
 
 	const { id: audioId, name } = audioInfo;

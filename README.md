@@ -162,7 +162,17 @@ optional arguments:
 将有兴趣的音源代号用 `-o` 传入 UNM 即可使用，像这样：
 
 ```bash
+# 使用多个音源
 node app.js -o bilibili ytdlp
+
+# 使用 pyncmd 音源（网易云）
+node app.js -o pyncmd
+
+# 使用 pyncmd 的酷我音乐源
+node app.js -o pyncmd-kuwo
+
+# 混合使用多个音源，包括 pyncmd 系列
+node app.js -o pyncmd-kuwo pyncmd-joox kugou bodian
 ```
 
 | 名称                        | 代号        | 默认启用 | 注意事项                                                                       |
@@ -178,9 +188,19 @@ node app.js -o bilibili ytdlp
 | YouTube（通过 `yt-dlp`)     | `ytdlp`     | ✅       | 需要自行安装 `yt-dlp`（`youtube-dl` 仍在活跃维护的 fork）。                    |
 | B 站音乐                    | `bilibili`  |          |                                                                                |
 | B 站音乐                    | `bilivideo` |          | 在大陆地区外的IP地址可能查询不到某些版权视频（如索尼音乐上传的MV等）           |
-| 第三方网易云 API            | `pyncmd`    |          |                                                                                |
+| 第三方网易云 API            | `pyncmd`    |          | 使用网易云作为源（默认模式）                                                   |
+| 第三方酷我 API (pyncmd)     | `pyncmd-kuwo` |        | 通过第三方 API 使用酷我音乐源                                                 |
+| 第三方 JOOX API (pyncmd)    | `pyncmd-joox` |        | 通过第三方 API 使用 JOOX 音乐源                                                |
+| 第三方其他源 API (pyncmd)   | `pyncmd-{source}` |      | 动态支持其他音乐源，如 `pyncmd-migu`、`pyncmd-kugou` 等                       |
 
 - 支持 `pyncmd` 的 API 服务由 GD studio <https://music.gdstudio.xyz> 提供。
+- `pyncmd` 音源支持动态配置多个音乐平台，格式为 `pyncmd-{source}`，其中 `{source}` 可以是：
+  - `kuwo` - 酷我音乐
+  - `joox` - JOOX 音乐
+  - `migu` - 咪咕音乐
+  - `kugou` - 酷狗音乐
+  - 以及其他 API 支持的音乐源
+- 如果只配置 `pyncmd`（不带后缀），则使用默认的网易云源。
 
 ### 环境变量
 

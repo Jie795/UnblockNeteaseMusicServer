@@ -69,12 +69,26 @@ if (config.forceHost && require('net').isIP(config.forceHost) === 0) {
 	process.exit(1);
 }
 if (config.matchOrder) {
-	const provider = Object.keys(require('./consts').PROVIDERS);
+	const { PROVIDERS, registerPyncmd } = require('./consts');
+	const pyncmdProvider = require('./provider/pyncmd');
+	const provider = Object.keys(PROVIDERS);
 	const candidate = config.matchOrder;
+	
+	// Dynamically register pyncmd-{source} providers if needed
+	candidate.forEach((key) => {
+		if (key.startsWith('pyncmd-') && !provider.includes(key)) {
+			const sourceName = pyncmdProvider.getSourceFromProviderName(key);
+			registerPyncmd(sourceName);
+		}
+	});
+	
+	// Re-get provider list after dynamic registration
+	const allProviders = Object.keys(require('./consts').PROVIDERS);
+	
 	if (candidate.some((key, index) => index != candidate.indexOf(key))) {
 		console.log('Please check the duplication in match order.');
 		process.exit(1);
-	} else if (candidate.some((key) => !provider.includes(key))) {
+	} else if (candidate.some((key) => !allProviders.includes(key))) {
 		console.log('Please check the availability of match sources.');
 		process.exit(1);
 	}
