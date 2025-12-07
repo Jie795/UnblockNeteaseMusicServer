@@ -787,7 +787,44 @@ const tryMatch = (ctx) => {
 						}
 					} catch (e) {}
 				})
-				.catch((e) => e && logger.error(e));
+				.catch((e) => {
+					if (e) {
+						// Enhanced error logging with stack trace
+						if (e.name === 'AggregateError' && e.errors) {
+							logger.error(
+								{
+									err: e,
+									errors: e.errors,
+									stack: e.stack,
+									message: e.message,
+								},
+								`ERROR: (hook) All promises were rejected`
+							);
+							// Log each individual error
+							e.errors.forEach((error, index) => {
+								if (error) {
+									logger.error(
+										{
+											err: error,
+											stack: error.stack,
+											message: error.message,
+										},
+										`  Error ${index + 1}:`
+									);
+								}
+							});
+						} else {
+							logger.error(
+								{
+									err: e,
+									stack: e.stack,
+									message: e.message,
+								},
+								`ERROR: (hook)`
+							);
+						}
+					}
+				});
 		} else if (item.code === 200 && netease.web) {
 			item.url = item.url.replace(
 				/(m\d+?)(?!c)\.music\.126\.net/,
@@ -815,7 +852,44 @@ const tryMatch = (ctx) => {
 				); // reduce time cost
 		tasks = jsonBody.data.map((item) => inject(item));
 	}
-	return Promise.all(tasks).catch((e) => e && logger.error(e));
+	return Promise.all(tasks).catch((e) => {
+		if (e) {
+			// Enhanced error logging with stack trace
+			if (e.name === 'AggregateError' && e.errors) {
+				logger.error(
+					{
+						err: e,
+						errors: e.errors,
+						stack: e.stack,
+						message: e.message,
+					},
+					`ERROR: (hook) All promises were rejected`
+				);
+				// Log each individual error
+				e.errors.forEach((error, index) => {
+					if (error) {
+						logger.error(
+							{
+								err: error,
+								stack: error.stack,
+								message: error.message,
+							},
+							`  Error ${index + 1}:`
+						);
+					}
+				});
+			} else {
+				logger.error(
+					{
+						err: e,
+						stack: e.stack,
+						message: e.message,
+					},
+					`ERROR: (hook)`
+				);
+			}
+		}
+	});
 };
 
 const unblockSoundEffects = (obj) => {
