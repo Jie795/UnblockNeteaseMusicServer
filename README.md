@@ -175,31 +175,31 @@ node app.js -o pyncmd-kuwo
 node app.js -o pyncmd-kuwo pyncmd-joox kugou bodian
 ```
 
-| 名称                        | 代号        | 默认启用 | 注意事项                                                                       |
-| --------------------------- | ----------- | -------- | ------------------------------------------------------------------------------ |
-| QQ 音乐                     | `qq`        |          | 需要准备自己的 `QQ_COOKIE`（请参阅下方〈环境变量〉处）。必须使用 QQ 登录。     |
-| 酷狗音乐                    | `kugou`     | ✅       |                                                                                |
-| 酷我音乐                    | `kuwo`      |          |                                                                                |
-| 波点音乐                    | `bodian`    | ✅       |                                                                                |
-| 咪咕音乐                    | `migu`      | ✅       | 需要准备自己的 `MIGU_COOKIE`（请参阅下方〈环境变量〉处）。                     |
-| JOOX                        | `joox`      |          | 需要准备自己的 `JOOX_COOKIE`（请参阅下方〈环境变量〉处）。似乎有严格地区限制。 |
-| YouTube（纯 JS 解析方式）   | `youtube`   |          | 需要 Google 认定的**非中国大陆区域** IP 地址。                                 |
-| YouTube（通过 `youtube-dl`) | `youtubedl` |          | 需要自行安装 `youtube-dl`。                                                    |
-| YouTube（通过 `yt-dlp`)     | `ytdlp`     | ✅       | 需要自行安装 `yt-dlp`（`youtube-dl` 仍在活跃维护的 fork）。                    |
-| B 站音乐                    | `bilibili`  |          |                                                                                |
-| B 站音乐                    | `bilivideo` |          | 在大陆地区外的IP地址可能查询不到某些版权视频（如索尼音乐上传的MV等）           |
-| 第三方网易云 API            | `pyncmd`    |          | 使用网易云作为源（默认模式）                                                   |
-| 第三方酷我 API (pyncmd)     | `pyncmd-kuwo` |        | 通过第三方 API 使用酷我音乐源                                                 |
-| 第三方 JOOX API (pyncmd)    | `pyncmd-joox` |        | 通过第三方 API 使用 JOOX 音乐源                                                |
-| 第三方其他源 API (pyncmd)   | `pyncmd-{source}` |      | 动态支持其他音乐源，如 `pyncmd-migu`、`pyncmd-kugou` 等                       |
+| 名称                        | 代号              | 默认启用 | 注意事项                                                                       |
+| --------------------------- | ----------------- | -------- | ------------------------------------------------------------------------------ |
+| QQ 音乐                     | `qq`              |          | 需要准备自己的 `QQ_COOKIE`（请参阅下方〈环境变量〉处）。必须使用 QQ 登录。     |
+| 酷狗音乐                    | `kugou`           | ✅       |                                                                                |
+| 酷我音乐                    | `kuwo`            |          |                                                                                |
+| 波点音乐                    | `bodian`          | ✅       |                                                                                |
+| 咪咕音乐                    | `migu`            | ✅       | 需要准备自己的 `MIGU_COOKIE`（请参阅下方〈环境变量〉处）。                     |
+| JOOX                        | `joox`            |          | 需要准备自己的 `JOOX_COOKIE`（请参阅下方〈环境变量〉处）。似乎有严格地区限制。 |
+| YouTube（纯 JS 解析方式）   | `youtube`         |          | 需要 Google 认定的**非中国大陆区域** IP 地址。                                 |
+| YouTube（通过 `youtube-dl`) | `youtubedl`       |          | 需要自行安装 `youtube-dl`。                                                    |
+| YouTube（通过 `yt-dlp`)     | `ytdlp`           | ✅       | 需要自行安装 `yt-dlp`（`youtube-dl` 仍在活跃维护的 fork）。                    |
+| B 站音乐                    | `bilibili`        |          |                                                                                |
+| B 站音乐                    | `bilivideo`       |          | 在大陆地区外的IP地址可能查询不到某些版权视频（如索尼音乐上传的MV等）           |
+| 第三方网易云 API            | `pyncmd`          |          | 使用网易云作为源（默认模式）                                                   |
+| 第三方酷我 API (pyncmd)     | `pyncmd-kuwo`     |          | 通过第三方 API 使用酷我音乐源                                                  |
+| 第三方 JOOX API (pyncmd)    | `pyncmd-joox`     |          | 通过第三方 API 使用 JOOX 音乐源                                                |
+| 第三方其他源 API (pyncmd)   | `pyncmd-{source}` |          | 动态支持其他音乐源，如 `pyncmd-migu`、`pyncmd-kugou` 等                        |
 
 - 支持 `pyncmd` 的 API 服务由 GD studio <https://music.gdstudio.xyz> 提供。
 - `pyncmd` 音源支持动态配置多个音乐平台，格式为 `pyncmd-{source}`，其中 `{source}` 可以是：
-  - `kuwo` - 酷我音乐
-  - `joox` - JOOX 音乐
-  - `migu` - 咪咕音乐
-  - `kugou` - 酷狗音乐
-  - 以及其他 API 支持的音乐源
+    - `kuwo` - 酷我音乐
+    - `joox` - JOOX 音乐
+    - `migu` - 咪咕音乐
+    - `kugou` - 酷狗音乐
+    - 以及其他 API 支持的音乐源
 - 如果只配置 `pyncmd`（不带后缀），则使用默认的网易云源。
 
 ### 环境变量
@@ -220,14 +220,14 @@ node app.js -o pyncmd-kuwo pyncmd-joox kugou bodian
 | SELECT_MAX_BR         | bool | 选择所有音源中的最高码率替换音频                                                                        | `SELECT_MAX_BR=true`                                             |
 | LOG_LEVEL             | str  | 日志输出等级。请见〈日志等级〉部分。                                                                    | `LOG_LEVEL=debug`                                                |
 | LOG_FILE              | str  | 从 Pino 端设置日志输出的文件位置。也可以用 `*sh` 的输出重导向功能 (`node app.js >> app.log`) 代替       | `LOG_FILE=app.log`                                               |
-| JOOX_COOKIE           | str  | JOOX 音源的 wmid 和 session_key cookie。支持 cookie 字符串或 HTTP(S) URL                        | `JOOX_COOKIE="wmid=<your_wmid>; session_key=<your_session_key>"` |
-| MIGU_COOKIE           | str  | 咪咕音源的 aversionid cookie。支持 cookie 字符串或 HTTP(S) URL                                  | `MIGU_COOKIE="<your_aversionid>"`                                |
-| QQ_COOKIE             | str  | QQ 音源的 uin 和 qm_keyst cookie。支持 cookie 字符串或 HTTP(S) URL                              | `QQ_COOKIE="uin=<your_uin>; qm_keyst=<your_qm_keyst>"`           |
+| JOOX_COOKIE           | str  | JOOX 音源的 wmid 和 session_key cookie。支持 cookie 字符串或 HTTP(S) URL                                | `JOOX_COOKIE="wmid=<your_wmid>; session_key=<your_session_key>"` |
+| MIGU_COOKIE           | str  | 咪咕音源的 aversionid cookie。支持 cookie 字符串或 HTTP(S) URL                                          | `MIGU_COOKIE="<your_aversionid>"`                                |
+| QQ_COOKIE             | str  | QQ 音源的 uin 和 qm_keyst cookie。支持 cookie 字符串或 HTTP(S) URL                                      | `QQ_COOKIE="uin=<your_uin>; qm_keyst=<your_qm_keyst>"`           |
 | YOUTUBE_KEY           | str  | Youtube 音源的 Data API v3 Key                                                                          | `YOUTUBE_KEY="<your_data_api_key>"`                              |
 | SIGN_CERT             | path | 自定义证书文件                                                                                          | `SIGN_CERT="./server.crt"`                                       |
 | SIGN_KEY              | path | 自定义密钥文件                                                                                          | `SIGN_KEY="./server.key"`                                        |
 | SEARCH_ALBUM          | bool | 在其他音源搜索歌曲时携带专辑名称（默认搜索条件 `歌曲名 - 歌手`，启用后搜索条件 `歌曲名 - 歌手 专辑名`） | `SEARCH_ALBUM=true`                                              |
-| NETEASE_COOKIE        | str  | 网易云 Cookie。支持 cookie 字符串或 HTTP(S) URL                                                 | `MUSIC_U=007554xxx`                                              |
+| NETEASE_COOKIE        | str  | 网易云 Cookie。支持 cookie 字符串或 HTTP(S) URL                                                         | `MUSIC_U=007554xxx`                                              |
 
 #### 日志等级 (`LOG_LEVEL`)
 
@@ -244,18 +244,20 @@ node app.js -o pyncmd-kuwo pyncmd-joox kugou bodian
 所有 Cookie 相关的环境变量（`QQ_COOKIE`、`MIGU_COOKIE`、`JOOX_COOKIE`、`NETEASE_COOKIE`）支持两种配置方式：
 
 1. **直接配置 Cookie 字符串**
-   ```bash
-   QQ_COOKIE="uin=123456; qm_keyst=abcdef..."
-   ```
+
+    ```bash
+    QQ_COOKIE="uin=123456; qm_keyst=abcdef..."
+    ```
 
 2. **通过 HTTP(S) URL 获取**
-   
-   如果 Cookie 值以 `http://` 或 `https://` 开头，程序会自动发送 GET 请求获取内容：
-   ```bash
-   QQ_COOKIE="https://example.com/qq_cookie.txt"
-   ```
-   
-   适用于集中管理多个服务器的 Cookie 配置。URL 返回的内容应为纯文本格式的 Cookie 字符串。
+
+    如果 Cookie 值以 `http://` 或 `https://` 开头，程序会自动发送 GET 请求获取内容：
+
+    ```bash
+    QQ_COOKIE="https://example.com/qq_cookie.txt"
+    ```
+
+    适用于集中管理多个服务器的 Cookie 配置。URL 返回的内容应为纯文本格式的 Cookie 字符串。
 
 ## 使用
 

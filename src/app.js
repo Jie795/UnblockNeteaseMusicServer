@@ -73,7 +73,7 @@ if (config.matchOrder) {
 	const pyncmdProvider = require('./provider/pyncmd');
 	const provider = Object.keys(PROVIDERS);
 	const candidate = config.matchOrder;
-	
+
 	// Dynamically register pyncmd-{source} providers if needed
 	candidate.forEach((key) => {
 		if (key.startsWith('pyncmd-') && !provider.includes(key)) {
@@ -81,10 +81,10 @@ if (config.matchOrder) {
 			registerPyncmd(sourceName);
 		}
 	});
-	
+
 	// Re-get provider list after dynamic registration
 	const allProviders = Object.keys(require('./consts').PROVIDERS);
-	
+
 	if (candidate.some((key, index) => index != candidate.indexOf(key))) {
 		console.log('Please check the duplication in match order.');
 		process.exit(1);

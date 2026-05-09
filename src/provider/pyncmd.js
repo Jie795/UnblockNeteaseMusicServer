@@ -40,10 +40,14 @@ const search = (source, info) => {
 				results = jsonBody;
 			} else if (jsonBody && Array.isArray(jsonBody.data)) {
 				results = jsonBody.data;
-			} else if (jsonBody && jsonBody.result && Array.isArray(jsonBody.result)) {
+			} else if (
+				jsonBody &&
+				jsonBody.result &&
+				Array.isArray(jsonBody.result)
+			) {
 				results = jsonBody.result;
 			}
-			
+
 			if (!results || results.length === 0) {
 				return Promise.reject();
 			}
@@ -115,19 +119,19 @@ const track = (source, id) => {
  */
 function createProvider(source) {
 	const cs = getManagedCacheStorage(`provider/pyncmd-${source}`);
-	
+
 	const check = (info) => {
 		// For netease, we can use the id directly from info
 		if (source === 'netease' && info.id) {
 			return cs.cache(info, () => track(source, info.id));
 		}
-		
+
 		// For other sources, we need to search first
-		return cs.cache(info, () => 
+		return cs.cache(info, () =>
 			search(source, info).then((id) => track(source, id))
 		);
 	};
-	
+
 	return { check };
 }
 

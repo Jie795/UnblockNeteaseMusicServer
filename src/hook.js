@@ -31,7 +31,10 @@ let LOADED_NETEASE_COOKIE = null;
 // 初始化 NETEASE_COOKIE（支持从 URL 加载，带缓存）
 async function initNeteaseCookie() {
 	if (process.env.NETEASE_COOKIE) {
-		LOADED_NETEASE_COOKIE = await loadCookie(process.env.NETEASE_COOKIE, 'NETEASE_COOKIE');
+		LOADED_NETEASE_COOKIE = await loadCookie(
+			process.env.NETEASE_COOKIE,
+			'NETEASE_COOKIE'
+		);
 	}
 	return LOADED_NETEASE_COOKIE;
 }

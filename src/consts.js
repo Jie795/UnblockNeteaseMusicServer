@@ -23,14 +23,14 @@ const PROVIDERS = {
 function registerPyncmdProviders() {
 	// Pre-register common sources
 	const commonSources = ['kuwo', 'joox'];
-	
+
 	commonSources.forEach((source) => {
 		const providerName = `pyncmd-${source}`;
 		if (!(providerName in PROVIDERS)) {
 			PROVIDERS[providerName] = pyncmdProvider.createProvider(source);
 		}
 	});
-	
+
 	// Return a function to dynamically register additional sources on demand
 	return (source) => {
 		const providerName = `pyncmd-${source}`;
