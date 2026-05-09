@@ -66,7 +66,8 @@ async function match(id, source, data) {
 		.map((name) => {
 			// Check if it's a pyncmd-{source} format provider
 			if (name.startsWith('pyncmd-') && !(name in providers)) {
-				const sourceName = pyncmdProvider.getSourceFromProviderName(name);
+				const sourceName =
+					pyncmdProvider.getSourceFromProviderName(name);
 				// Register the provider dynamically (for non-netease sources or explicit pyncmd-{source})
 				if (sourceName !== 'netease' || name !== 'pyncmd') {
 					registerPyncmd(sourceName);

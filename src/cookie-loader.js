@@ -21,13 +21,17 @@ async function loadCookie(cookieValue, name = 'Cookie') {
 	}
 
 	// 检查是否是 HTTP/HTTPS URL
-	if (cookieValue.startsWith('http://') || cookieValue.startsWith('https://')) {
+	if (
+		cookieValue.startsWith('http://') ||
+		cookieValue.startsWith('https://')
+	) {
 		// 检查缓存是否有效
 		const cached = cookieCache[name];
 		if (cached && cached.expireTime > Date.now()) {
-			const preview = cached.value.length > 50 
-				? cached.value.substring(0, 50) + '...' 
-				: cached.value;
+			const preview =
+				cached.value.length > 50
+					? cached.value.substring(0, 50) + '...'
+					: cached.value;
 			logger.debug(`使用缓存的 ${name}: ${preview}`);
 			return cached.value;
 		}
@@ -38,17 +42,18 @@ async function loadCookie(cookieValue, name = 'Cookie') {
 			const response = await request('GET', cookieValue);
 			const cookieText = await response.body();
 			const trimmedCookie = cookieText.toString().trim();
-			
+
 			if (trimmedCookie) {
 				// 保存到缓存
 				cookieCache[name] = {
 					value: trimmedCookie,
-					expireTime: Date.now() + CACHE_DURATION
+					expireTime: Date.now() + CACHE_DURATION,
 				};
 
-				const preview = trimmedCookie.length > 50 
-					? trimmedCookie.substring(0, 50) + '...' 
-					: trimmedCookie;
+				const preview =
+					trimmedCookie.length > 50
+						? trimmedCookie.substring(0, 50) + '...'
+						: trimmedCookie;
 				logger.info(`✓ 成功获取 ${name}: ${preview} (缓存 24 小时)`);
 				return trimmedCookie;
 			} else {
@@ -56,22 +61,25 @@ async function loadCookie(cookieValue, name = 'Cookie') {
 				return null;
 			}
 		} catch (error) {
-			logger.error(`✗ 获取 ${name} 失败: ${error.message || error.code || 'Unknown error'}`);
-			
+			logger.error(
+				`✗ 获取 ${name} 失败: ${error.message || error.code || 'Unknown error'}`
+			);
+
 			// 如果有缓存（即使过期），在出错时仍然使用
 			if (cached && cached.value) {
 				logger.warn(`使用过期的缓存 ${name}`);
 				return cached.value;
 			}
-			
+
 			return null;
 		}
 	}
 
 	// 直接返回 Cookie 字符串（不缓存）
-	const preview = cookieValue.length > 50 
-		? cookieValue.substring(0, 50) + '...' 
-		: cookieValue;
+	const preview =
+		cookieValue.length > 50
+			? cookieValue.substring(0, 50) + '...'
+			: cookieValue;
 	logger.info(`使用配置的 ${name}: ${preview}`);
 	return cookieValue;
 }
