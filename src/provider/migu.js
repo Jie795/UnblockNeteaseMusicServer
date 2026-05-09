@@ -2,12 +2,20 @@ const insure = require('./insure');
 const select = require('./select');
 const request = require('../request');
 const { getManagedCacheStorage } = require('../cache');
+const { loadCookie } = require('../cookie-loader');
+
+// 初始化 Cookie（支持从 URL 加载，带缓存）
+async function initCookie() {
+	const cookieValue = process.env.MIGU_COOKIE;
+	const loadedCookie = await loadCookie(cookieValue, 'MIGU_COOKIE');
+	headers.aversionid = loadedCookie;
+}
 
 const headers = {
 	origin: 'http://music.migu.cn/',
 	referer: 'http://m.music.migu.cn/v3/',
 	// cookie: 'migu_music_sid=' + (process.env.MIGU_COOKIE || null),
-	aversionid: process.env.MIGU_COOKIE || null,
+	aversionid: null,
 	channel: '0146921',
 };
 
@@ -73,6 +81,9 @@ const track = (id) =>
 		.catch(() => insure().migu.track(id));
 
 const cs = getManagedCacheStorage('provider/migu');
-const check = (info) => cs.cache(info, () => search(info)).then(track);
+const check = async (info) => {
+	await initCookie();
+	return cs.cache(info, () => search(info)).then(track);
+};
 
 module.exports = { check, track };

@@ -6,6 +6,7 @@ const querystring = require('querystring');
 const { isHost, cookieToMap, mapToCookie } = require('./utilities');
 const { getManagedCacheStorage } = require('./cache');
 const { logScope } = require('./logger');
+const { loadCookie } = require('./cookie-loader');
 
 const logger = logScope('hook');
 const cs = getManagedCacheStorage('hook');
@@ -23,6 +24,17 @@ const LOCAL_VIP_UID = (process.env.LOCAL_VIP_UID || '')
 	.split(',')
 	.map((str) => parseInt(str))
 	.filter((num) => !Number.isNaN(num));
+
+// 存储加载后的 NETEASE_COOKIE
+let LOADED_NETEASE_COOKIE = null;
+
+// 初始化 NETEASE_COOKIE（支持从 URL 加载，带缓存）
+async function initNeteaseCookie() {
+	if (process.env.NETEASE_COOKIE) {
+		LOADED_NETEASE_COOKIE = await loadCookie(process.env.NETEASE_COOKIE, 'NETEASE_COOKIE');
+	}
+	return LOADED_NETEASE_COOKIE;
+}
 
 const hook = {
 	request: {
@@ -116,7 +128,7 @@ const domainList = [
 	'interface3.music.163.com',
 ];
 
-hook.request.before = (ctx) => {
+hook.request.before = async (ctx) => {
 	const { req } = ctx;
 	req.url =
 		(req.url.startsWith('http://')
@@ -136,9 +148,11 @@ hook.request.before = (ctx) => {
 	)
 		ctx.decision = 'proxy';
 
-	if (process.env.NETEASE_COOKIE && url.path.includes('url')) {
+	// 初始化并使用 NETEASE_COOKIE
+	const neteaseCookie = await initNeteaseCookie();
+	if (neteaseCookie && url.path.includes('url')) {
 		var cookies = cookieToMap(req.headers.cookie);
-		var new_cookies = cookieToMap(process.env.NETEASE_COOKIE);
+		var new_cookies = cookieToMap(neteaseCookie);
 
 		Object.entries(new_cookies).forEach(([key, value]) => {
 			cookies[key] = value;

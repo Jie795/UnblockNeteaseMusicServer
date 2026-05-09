@@ -2,8 +2,17 @@ const insure = require('./insure');
 const select = require('./select');
 const request = require('../request');
 const { getManagedCacheStorage } = require('../cache');
+const { loadCookie } = require('../cookie-loader');
 
-let COOKIE = process.env.NEW_QQ_COOKIE || process.env.QQ_COOKIE;
+let COOKIE = null;
+
+// 初始化 Cookie（支持从 URL 加载，带缓存）
+async function initCookie() {
+	const cookieValue = process.env.NEW_QQ_COOKIE || process.env.QQ_COOKIE;
+	COOKIE = await loadCookie(cookieValue, 'QQ_COOKIE');
+	headers.cookie = COOKIE;
+	return COOKIE;
+}
 const headers = {
 	origin: 'http://y.qq.com/',
 	referer: 'http://y.qq.com/',
@@ -157,7 +166,8 @@ const track = (id) => {
 };
 
 const cs = getManagedCacheStorage('provider/qq');
-const check = (info) => {
+const check = async (info) => {
+	await initCookie();
 	const now = Math.floor(Date.now() / 1000);
 	const musickey_createtime =
 		((COOKIE || '').match(/musickey_createtime=(\d+)/) || [])[1] || '';

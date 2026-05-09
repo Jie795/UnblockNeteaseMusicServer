@@ -3,6 +3,14 @@ const select = require('./select');
 const crypto = require('../crypto');
 const request = require('../request');
 const { getManagedCacheStorage } = require('../cache');
+const { loadCookie } = require('../cookie-loader');
+
+// 初始化 Cookie（支持从 URL 加载，带缓存）
+async function initCookie() {
+	const cookieValue = process.env.JOOX_COOKIE;
+	const loadedCookie = await loadCookie(cookieValue, 'JOOX_COOKIE');
+	headers.cookie = loadedCookie;
+}
 
 const headers = {
 	origin: 'http://www.joox.com',
@@ -10,7 +18,7 @@ const headers = {
 	// Refer to #95, you should register an account
 	// on Joox to use their service. We allow users
 	// to specify it manually.
-	cookie: process.env.JOOX_COOKIE || null, // 'wmid=<your_wmid>; session_key=<your_session_key>;'
+	cookie: null, // 'wmid=<your_wmid>; session_key=<your_session_key>;'
 };
 
 const fit = (info) => {
@@ -78,6 +86,9 @@ const track = (id) => {
 };
 
 const cs = getManagedCacheStorage('provider/joox');
-const check = (info) => cs.cache(info, () => search(info)).then(track);
+const check = async (info) => {
+	await initCookie();
+	return cs.cache(info, () => search(info)).then(track);
+};
 
 module.exports = { check, track };
