@@ -4,16 +4,12 @@ on:
     push:
         branches:
             - 'enhanced'
-            - 'main'
-            - 'master'
         paths:
             - '.github/workflows/push-docker.yml'
             - 'precompiled/**'
-            - 'src/**'
             - 'Dockerfile'
             - 'server.crt'
             - 'server.key'
-            - 'package.json'
 
     release:
         types:
