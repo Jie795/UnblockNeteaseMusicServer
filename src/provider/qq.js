@@ -2,19 +2,57 @@ const insure = require('./insure');
 const select = require('./select');
 const request = require('../request');
 const { getManagedCacheStorage } = require('../cache');
+const { getCookie } = require('../cookieManager');
 
-let COOKIE = process.env.NEW_QQ_COOKIE || process.env.QQ_COOKIE;
+let COOKIE = null;
+let cookieInitialized = false;
+
+// 同步初始化 cookie（如果是 URL 则异步获取）
+const initCookieSync = () => {
+	const envCookie = process.env.NEW_QQ_COOKIE || process.env.QQ_COOKIE;
+	if (envCookie && !envCookie.startsWith('http://') && !envCookie.startsWith('https://')) {
+		// 如果不是 URL，直接使用
+		COOKIE = envCookie;
+		cookieInitialized = true;
+	}
+};
+
+// 异步初始化 cookie（从 URL 获取）
+let cookieInitPromise = null;
+const initCookie = async () => {
+	if (cookieInitialized) return;
+	
+	if (!cookieInitPromise) {
+		cookieInitPromise = (async () => {
+			const cookieValue = await getCookie(process.env.QQ_COOKIE, 'qq_cookie');
+			if (cookieValue) {
+				COOKIE = cookieValue;
+				cookieInitialized = true;
+			}
+		})();
+	}
+	return cookieInitPromise;
+};
+
+// 模块加载时同步初始化
+initCookieSync();
+
 const headers = {
 	origin: 'http://y.qq.com/',
 	referer: 'http://y.qq.com/',
-	cookie: COOKIE || null, // 'uin=; qm_keyst=',
+	get cookie() {
+		return COOKIE || null;
+	},
+	set cookie(value) {
+		COOKIE = value;
+	}
 };
 
 const refresh = () => {
 	const refresh_token =
-		(COOKIE.match(/qqrefresh_token=([^;]*)/) || [])[1] || '';
-	const musickey = (COOKIE.match(/qqmusic_key=([^;]*)/) || [])[1] || '';
-	const musicid = parseInt((COOKIE.match(/uin=(\d+)/) || [])[1] || 0, 10);
+		(COOKIE?.match(/qqrefresh_token=([^;]*)/) || [])[1] || '';
+	const musickey = (COOKIE?.match(/qqmusic_key=([^;]*)/) || [])[1] || '';
+	const musicid = parseInt((COOKIE?.match(/uin=(\d+)/) || [])[1] || 0, 10);
 
 	const body = {
 		req: {
@@ -52,7 +90,6 @@ const refresh = () => {
 					`$1${newMusickeyCreateTime}`
 				);
 			process.env.NEW_QQ_COOKIE = newCookie;
-			headers.cookie = newCookie;
 			COOKIE = newCookie;
 		});
 };
@@ -157,7 +194,10 @@ const track = (id) => {
 };
 
 const cs = getManagedCacheStorage('provider/qq');
-const check = (info) => {
+const check = async (info) => {
+	// 确保 cookie 已初始化
+	await initCookie();
+	
 	const now = Math.floor(Date.now() / 1000);
 	const musickey_createtime =
 		((COOKIE || '').match(/musickey_createtime=(\d+)/) || [])[1] || '';

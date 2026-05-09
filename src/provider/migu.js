@@ -2,12 +2,51 @@ const insure = require('./insure');
 const select = require('./select');
 const request = require('../request');
 const { getManagedCacheStorage } = require('../cache');
+const { getCookie } = require('../cookieManager');
+
+let AVERSIONID = null;
+let cookieInitialized = false;
+
+// 同步初始化 cookie（如果是 URL 则异步获取）
+const initCookieSync = () => {
+	const envCookie = process.env.MIGU_COOKIE;
+	if (envCookie && !envCookie.startsWith('http://') && !envCookie.startsWith('https://')) {
+		// 如果不是 URL，直接使用
+		AVERSIONID = envCookie;
+		cookieInitialized = true;
+	}
+};
+
+// 异步初始化 cookie（从 URL 获取）
+let cookieInitPromise = null;
+const initCookie = async () => {
+	if (cookieInitialized) return;
+	
+	if (!cookieInitPromise) {
+		cookieInitPromise = (async () => {
+			const cookieValue = await getCookie(process.env.MIGU_COOKIE, 'migu_cookie');
+			if (cookieValue) {
+				AVERSIONID = cookieValue;
+				cookieInitialized = true;
+			}
+		})();
+	}
+	return cookieInitPromise;
+};
+
+// 模块加载时同步初始化
+initCookieSync();
 
 const headers = {
 	origin: 'http://music.migu.cn/',
 	referer: 'http://m.music.migu.cn/v3/',
 	// cookie: 'migu_music_sid=' + (process.env.MIGU_COOKIE || null),
-	aversionid: process.env.MIGU_COOKIE || null,
+	get aversionid() {
+		return AVERSIONID || null;
+	},
+	set aversionid(value) {
+		AVERSIONID = value;
+	},
 	channel: '0146921',
 };
 
@@ -73,6 +112,10 @@ const track = (id) =>
 		.catch(() => insure().migu.track(id));
 
 const cs = getManagedCacheStorage('provider/migu');
-const check = (info) => cs.cache(info, () => search(info)).then(track);
+const check = async (info) => {
+	// 确保 cookie 已初始化
+	await initCookie();
+	return cs.cache(info, () => search(info)).then(track);
+};
 
 module.exports = { check, track };

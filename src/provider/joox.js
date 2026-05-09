@@ -3,6 +3,40 @@ const select = require('./select');
 const crypto = require('../crypto');
 const request = require('../request');
 const { getManagedCacheStorage } = require('../cache');
+const { getCookie } = require('../cookieManager');
+
+let COOKIE = null;
+let cookieInitialized = false;
+
+// 同步初始化 cookie（如果是 URL 则异步获取）
+const initCookieSync = () => {
+	const envCookie = process.env.JOOX_COOKIE;
+	if (envCookie && !envCookie.startsWith('http://') && !envCookie.startsWith('https://')) {
+		// 如果不是 URL，直接使用
+		COOKIE = envCookie;
+		cookieInitialized = true;
+	}
+};
+
+// 异步初始化 cookie（从 URL 获取）
+let cookieInitPromise = null;
+const initCookie = async () => {
+	if (cookieInitialized) return;
+	
+	if (!cookieInitPromise) {
+		cookieInitPromise = (async () => {
+			const cookieValue = await getCookie(process.env.JOOX_COOKIE, 'joox_cookie');
+			if (cookieValue) {
+				COOKIE = cookieValue;
+				cookieInitialized = true;
+			}
+		})();
+	}
+	return cookieInitPromise;
+};
+
+// 模块加载时同步初始化
+initCookieSync();
 
 const headers = {
 	origin: 'http://www.joox.com',
@@ -10,7 +44,12 @@ const headers = {
 	// Refer to #95, you should register an account
 	// on Joox to use their service. We allow users
 	// to specify it manually.
-	cookie: process.env.JOOX_COOKIE || null, // 'wmid=<your_wmid>; session_key=<your_session_key>;'
+	get cookie() {
+		return COOKIE || null;
+	},
+	set cookie(value) {
+		COOKIE = value;
+	}
 };
 
 const fit = (info) => {
@@ -78,6 +117,10 @@ const track = (id) => {
 };
 
 const cs = getManagedCacheStorage('provider/joox');
-const check = (info) => cs.cache(info, () => search(info)).then(track);
+const check = async (info) => {
+	// 确保 cookie 已初始化
+	await initCookie();
+	return cs.cache(info, () => search(info)).then(track);
+};
 
 module.exports = { check, track };

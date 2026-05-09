@@ -18,8 +18,9 @@ const logger = pino(
 				: {
 						colorize: colorize,
 						messageFormat: messageFormat,
-						ignore: 'time,pid,hostname,scope',
+						ignore: 'pid,hostname,scope',
 						errorProps: '*',
+						translateTime: 'yyyy-mm-dd HH:MM:ss',
 					},
 	},
 	// Redirect the logs to destFile if specified.

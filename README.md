@@ -220,9 +220,9 @@ node app.js -o pyncmd-kuwo pyncmd-joox kugou bodian
 | SELECT_MAX_BR         | bool | 选择所有音源中的最高码率替换音频                                                                        | `SELECT_MAX_BR=true`                                             |
 | LOG_LEVEL             | str  | 日志输出等级。请见〈日志等级〉部分。                                                                    | `LOG_LEVEL=debug`                                                |
 | LOG_FILE              | str  | 从 Pino 端设置日志输出的文件位置。也可以用 `*sh` 的输出重导向功能 (`node app.js >> app.log`) 代替       | `LOG_FILE=app.log`                                               |
-| JOOX_COOKIE           | str  | JOOX 音源的 wmid 和 session_key cookie                                                                  | `JOOX_COOKIE="wmid=<your_wmid>; session_key=<your_session_key>"` |
-| MIGU_COOKIE           | str  | 咪咕音源的 aversionid cookie                                                                            | `MIGU_COOKIE="<your_aversionid>"`                                |
-| QQ_COOKIE             | str  | QQ 音源的 uin 和 qm_keyst cookie                                                                        | `QQ_COOKIE="uin=<your_uin>; qm_keyst=<your_qm_keyst>"`           |
+| JOOX_COOKIE           | str  | JOOX 音源的 wmid 和 session_key cookie，支持直接填写 cookie 文本或 http(s):// 开头的 URL（从 URL 获取 cookie，缓存 1 小时） | `JOOX_COOKIE="wmid=<your_wmid>; session_key=<your_session_key>"` 或 `JOOX_COOKIE="https://example.com/joox-cookie"` |
+| MIGU_COOKIE           | str  | 咪咕音源的 aversionid cookie，支持直接填写 cookie 文本或 http(s):// 开头的 URL（从 URL 获取 cookie，缓存 1 小时）            | `MIGU_COOKIE="<your_aversionid>"` 或 `MIGU_COOKIE="https://example.com/migu-cookie"`                                |
+| QQ_COOKIE             | str  | QQ 音源的 uin 和 qm_keyst cookie，支持直接填写 cookie 文本或 http(s):// 开头的 URL（从 URL 获取 cookie，缓存 1 小时）        | `QQ_COOKIE="uin=<your_uin>; qm_keyst=<your_qm_keyst>"` 或 `QQ_COOKIE="https://example.com/qq-cookie"`           |
 | YOUTUBE_KEY           | str  | Youtube 音源的 Data API v3 Key                                                                          | `YOUTUBE_KEY="<your_data_api_key>"`                              |
 | SIGN_CERT             | path | 自定义证书文件                                                                                          | `SIGN_CERT="./server.crt"`                                       |
 | SIGN_KEY              | path | 自定义密钥文件                                                                                          | `SIGN_KEY="./server.key"`                                        |
